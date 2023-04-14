@@ -9,21 +9,50 @@ class GetResponseError extends Exception
 	}
 };
 
+class GetCurl {
+	public $curl;
+	public function __construct (string $url)
+	{
+		$this->curl=curl_init ();
+		curl_setopt($this->curl, CURLOPT_URL, $url);
+		curl_setopt($this->curl, CURLOPT_VERBOSE, false);
+		curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($this->curl, CURLOPT_BINARYTRANSFER, true);
+		curl_setopt($this->curl, CURLOPT_HEADER, false);
+	}
+	function exec ()
+	{
+		return curl_exec ($this->curl);
+	}
+	public function __destruct ()
+	{
+		curl_close($this->curl);
+	}
+};
+
 function get_response(string $url)
 {
-	$curlHandle=curl_init();
-	curl_setopt($curlHandle, CURLOPT_URL, $url);
-	curl_setopt($curlHandle, CURLOPT_VERBOSE, false);
-	curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($curlHandle, CURLOPT_BINARYTRANSFER, true);
-	curl_setopt($curlHandle, CURLOPT_HEADER, false);
-
-	if (!$v=curl_exec($curlHandle))
+	if (!$v=(new GetCurl($url))->exec())
 	{
 		throw new GetResponseError (curl_errno($curlHandle));
 	}
-	curl_close($curlHandle);
 	return $v;
+}
+class Res {
+	public $file;
+	public function __construct (string $e)
+	{
+		$this->file=fopen("$e/res.json", "a+");
+	}
+	public function write(string $dt)
+	{
+		fwrite($this->file,$dt);
+	}
+	public function __destruct ()
+	{
+		fflush($this->file);
+		fclose($this->file);
+	}
 }
 function down_this(string $url)
 {
@@ -31,21 +60,20 @@ function down_this(string $url)
 	if (!file_exists($e))
 	{
 		mkdir($e);
-		$f=fopen("$e/res.json", "a+");
+		$f=Res($e);
 		try {
-			$dt=get_response ("$url")
-				if ($dt==null)
-				{
-					throw GetResponseError ("Aaaah");
-				}
-			fwrite($f,$dt);
+			global $f;
+			$dt=get_response ("$url");
+			if ($dt==null)
+			{
+				throw GetResponseError ("Aaaah");
+			}
+			$f->write ($dt);
 		} catch (GetResponseError $s)
 		{
 			delete("$e/res.json");
 			delete($e);
 		}
-		fflush($f);
-		fclose($f);
 	}
 }
 function get_url($arg)
