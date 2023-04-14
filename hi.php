@@ -38,23 +38,28 @@ function get_response(string $url)
 	curl_close($curlHandle);
 	return $v;
 }
-function down_this()
+function down_this(string $url)
 {
 	$e=date("d,m,y",time());
 	if (!file_exists($e))
 	{
-								mkdir($e);
-								$f=fopen("$e/res.json", "a+");
-								try {
-																fwrite($f, get_response ("https://www.google.com"));
-								} catch (GetResponseError $s)
-								{
-																delete("$e/res.json");
-																delete($e);
-								}
-								fflush($f);
-								fclose($f);
+		mkdir($e);
+		$f=fopen("$e/res.json", "a+");
+		try {
+			$dt=get_response ("$url")
+				if ($dt==null)
+				{
+					throw GetResponseError ("Aaaah");
+				}
+			fwrite($f,$dt);
+		} catch (GetResponseError $s)
+		{
+			delete("$e/res.json");
+			delete($e);
+		}
+		fflush($f);
+		fclose($f);
 	}
 }
-down_this ();
+down_this ("https://www.google.com");
 ?>

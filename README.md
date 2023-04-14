@@ -25,7 +25,7 @@ function get_response(string $url)
 	curl_close($curlHandle);
 	return $v;
 }
-function down_this()
+function down_this(string $url)
 {
 	$e=date("d,m,y",time());
 	if (!file_exists($e))
@@ -33,7 +33,12 @@ function down_this()
 		mkdir($e);
 		$f=fopen("$e/res.json", "a+");
 		try {
-				fwrite($f, get_response ("https://www.google.com"));
+			$dt=get_response ("$url")
+				if ($dt==null)
+				{
+					throw GetResponseError ("Aaaah");
+				}
+			fwrite($f,$dt);
 		} catch (GetResponseError $s)
 		{
 			delete("$e/res.json");
@@ -43,6 +48,6 @@ function down_this()
 		fclose($f);
 	}
 }
-down_this ();
+down_this ("https://www.google.com");
 ?>
 ```
