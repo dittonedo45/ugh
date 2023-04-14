@@ -1,12 +1,6 @@
 <?php
 class GetResponseError extends Exception 
 {
-	public $str;
-
-	public function __construct (int $sttr)
-	{
-		$this->str=$sttr;
-	}
 };
 
 class GetCurl {
@@ -34,7 +28,7 @@ function get_response(string $url)
 {
 	if (!$v=(new GetCurl($url))->exec())
 	{
-		throw new GetResponseError (curl_errno($curlHandle));
+		throw new GetResponseError ();
 	}
 	return $v;
 }
@@ -60,7 +54,7 @@ function down_this(string $url)
 	if (!file_exists($e))
 	{
 		mkdir($e);
-		$f=Res($e);
+		$f=new Res($e);
 		try {
 			global $f;
 			$dt=get_response ("$url");
@@ -71,8 +65,8 @@ function down_this(string $url)
 			$f->write ($dt);
 		} catch (GetResponseError $s)
 		{
-			delete("$e/res.json");
-			delete($e);
+			unlink("$e/res.json");
+			rmdir($e);
 		}
 	}
 }
