@@ -61,5 +61,9 @@ function down_this(string $url)
 		fclose($f);
 	}
 }
+function get_url($arg)
+{
+	return get_response ($arg);
+}
 down_this ("https://www.google.com");
 ?>
