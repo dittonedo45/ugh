@@ -1,17 +1,4 @@
 <?php
-class Mark {
-	public $mark=0;
-	public $total=0;
-
-	public function __construct (int $mark,
-		int $total)
-	{
-		assert(mark<total);
-		$this->mark=$mark;
-		$this->total=$total;
-	}
-};
-
 class GetResponseError extends Exception 
 {
 	public $str;
